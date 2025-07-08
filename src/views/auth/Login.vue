@@ -31,6 +31,11 @@
           </div>
 
           <button type="submit" class="btn btn-primary w-100 mt-3">Đăng nhập</button>
+          <div class="text-end mt-2">
+            <router-link to="/forgot-password" class="text-decoration-none text-primary">
+              Quên mật khẩu?
+            </router-link>
+          </div>
 
           <div class="text-center mt-3">
             <p class="mb-1">Hoặc đăng nhập bằng</p>
@@ -43,7 +48,7 @@
               </button>
             </div>
           </div>
-          
+
           <p class="text-center mt-3">
             Chưa có tài khoản?
             <router-link to="/register" class="text-decoration-none fw-semibold text-primary">Đăng ký</router-link>

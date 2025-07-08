@@ -20,6 +20,8 @@ import ViewUser from '../components/user/ViewUser.vue'
 import OrderIndex from '../components/user/orders/OrderIndex.vue'
 import OrderAdminIndex from '../components/admin/order/OrderAdminIndex.vue'
 import SocialCallback from '../pages/SocialCallback.vue'
+import ForgotPassword from '../views/auth/ForgotPassword.vue'
+import ResetPassword from '../views/auth/ResetPassword.vue'
 
 const routes = [
   { path: '/', component: Home },
@@ -58,10 +60,17 @@ const routes = [
     children:[]
   },
   {
-  path: '/social-callback',
-  component: SocialCallback,
-}
-
+    path: '/social-callback',
+    component: SocialCallback,
+  },
+  {
+    path: '/forgot-password',
+    component: ForgotPassword,
+  },
+  {
+    path: '/reset-password/:token',
+    component: ResetPassword,
+  }
 ]
 
 const router = createRouter({
