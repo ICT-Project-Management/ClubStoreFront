@@ -56,7 +56,7 @@
               aria-expanded="false"
             >
               <img
-                :src="auth.user?.avatar || '../../assets/avatar-default.svg'"
+                :src="auth.user?.avatar || '../../assets/default-avatar.png'"
                 class="rounded-circle"
                 style="width: 28px; height: 28px; object-fit: cover;"
               />

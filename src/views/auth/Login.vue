@@ -32,6 +32,18 @@
 
           <button type="submit" class="btn btn-primary w-100 mt-3">Đăng nhập</button>
 
+          <div class="text-center mt-3">
+            <p class="mb-1">Hoặc đăng nhập bằng</p>
+            <div class="d-flex justify-content-center gap-3">
+              <button type="button" class="btn btn-outline-danger w-50" @click="loginWithGoogle">
+                <i class="bi bi-google me-2"></i> Google
+              </button>
+              <button type="button" class="btn btn-outline-primary w-50" @click="loginWithFacebook">
+                <i class="bi bi-facebook me-2"></i> Facebook
+              </button>
+            </div>
+          </div>
+          
           <p class="text-center mt-3">
             Chưa có tài khoản?
             <router-link to="/register" class="text-decoration-none fw-semibold text-primary">Đăng ký</router-link>
@@ -68,6 +80,33 @@ const handleLogin = async () => {
   } catch (err) {
     toast.error('Đăng nhập thất bại! Kiểm tra email và mật khẩu.')
     console.error(err)
+  }
+}
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
+const loginWithGoogle = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/google/redirect`, {
+      method: 'POST',
+    })
+    const data = await res.json()
+    if (data.url) window.location.href = data.url
+  } catch (error) {
+    toast.error('Lỗi khi đăng nhập với Google')
+    console.error(error)
+  }
+}
+
+const loginWithFacebook = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/facebook/redirect`, {
+      method: 'POST',
+    })
+    const data = await res.json()
+    if (data.url) window.location.href = data.url
+  } catch (error) {
+    toast.error('Lỗi khi đăng nhập với Facebook')
+    console.error(error)
   }
 }
 </script>

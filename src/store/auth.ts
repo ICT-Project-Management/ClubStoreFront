@@ -30,6 +30,18 @@ export const useAuthStore = defineStore('auth', {
       this.token = res.data.token
       localStorage.setItem('token', res.data.token)
     },
+    async setTokenAndFetchUser(token: string) {
+      this.token = token
+      localStorage.setItem('token', token)
+
+      try {
+        const res = await getUser()
+        this.user = res.data.user || res.data 
+      } catch (error) {
+        console.error('Token không hợp lệ hoặc hết hạn:', error)
+        this.logout()
+      }
+    },
     logout() {
       this.user = null
       this.token = null

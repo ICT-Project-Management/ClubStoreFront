@@ -19,6 +19,7 @@ import Profile from '../components/user/Profile.vue'
 import ViewUser from '../components/user/ViewUser.vue'
 import OrderIndex from '../components/user/orders/OrderIndex.vue'
 import OrderAdminIndex from '../components/admin/order/OrderAdminIndex.vue'
+import SocialCallback from '../pages/SocialCallback.vue'
 
 const routes = [
   { path: '/', component: Home },
@@ -55,7 +56,12 @@ const routes = [
     path: '/order/index', 
     component: OrderIndex, 
     children:[]
-  }
+  },
+  {
+  path: '/social-callback',
+  component: SocialCallback,
+}
+
 ]
 
 const router = createRouter({
