@@ -55,7 +55,7 @@ onMounted(fetchOrders)
 
 <template>
   <div class="container py-4">
-    <h2 class="mb-4 text-primary">📦 Quản lý đơn hàng</h2>
+    <h2 class="mb-4 text-dark">Quản lý đơn hàng</h2>
 
     <!-- BỘ LỌC -->
     <div class="card p-3 mb-4 shadow-sm">
@@ -122,6 +122,7 @@ onMounted(fetchOrders)
                   <option v-if="order.status === 'pending'" value="delivering">Đang giao</option>
                   <option v-if="order.status === 'pending'" value="cancelled">Huỷ</option>
                   <option v-if="order.status === 'delivering'" value="delivered">Đã giao</option>
+                  <option v-if="order.status === 'delivering'" value="cancelled">Hủy</option>
                   <option v-if="['delivering','delivered'].includes(order.status)" value="completed">Hoàn tất</option>
                 </select>
                 <button class="btn btn-sm btn-outline-success" @click="handleUpdate(order.id)" :disabled="!selectedStatus[order.id]">

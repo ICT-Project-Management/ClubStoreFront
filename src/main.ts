@@ -5,6 +5,7 @@ import router from './router'
 import { createPinia } from 'pinia'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
 createApp(App)
 .use(router)
 .use(createPinia())

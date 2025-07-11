@@ -22,6 +22,9 @@ import OrderAdminIndex from '../components/admin/order/OrderAdminIndex.vue'
 import SocialCallback from '../pages/SocialCallback.vue'
 import ForgotPassword from '../views/auth/ForgotPassword.vue'
 import ResetPassword from '../views/auth/ResetPassword.vue'
+import NewsAdmin from '../components/admin/news/NewsAdmin.vue'
+import CreateNews from '../components/admin/news/CreateNews.vue'
+import AllNews from '../components/user/news/AllNews.vue'
 
 const routes = [
   { path: '/', component: Home },
@@ -45,6 +48,8 @@ const routes = [
       { path: 'products/add-detail-clothes', component: AddDetailClothes },
       { path: 'products/add-detail-present', component: AddDetailPresent },
       { path: 'orders', component: OrderAdminIndex }, 
+      { path: 'news', component: NewsAdmin,},
+      { path: 'news/create', component: CreateNews },
     ]
   },
   {
@@ -70,7 +75,11 @@ const routes = [
   {
     path: '/reset-password/:token',
     component: ResetPassword,
-  }
+  },
+  {
+    path: '/view/all-news',
+    component: AllNews,
+  },
 ]
 
 const router = createRouter({
@@ -78,8 +87,17 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  const auth = useAuthStore()
+router.beforeEach(async(to, from, next) => {
+   const auth = useAuthStore()
+
+  if (auth.token && !auth.user) {
+    try {
+      await auth.init()
+    } catch (e) {
+      auth.logout()
+      return next('/login')
+    }
+  }
   const roles = auth.user?.roles || []
   const isAdmin = roles.some((r: any) => r.name === 'admin')
 

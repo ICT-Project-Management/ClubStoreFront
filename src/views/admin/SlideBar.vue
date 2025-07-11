@@ -22,6 +22,7 @@ const navItems = [
   { path: '/admin/users', label: 'Người dùng', icon: 'bi bi-people' },
   { path: '/admin/products', label: 'Sản phẩm', icon: 'bi bi-box-seam' },
   { path: '/admin/orders', label: 'Đơn hàng', icon: 'bi bi-receipt' },
+  { path: '/admin/news', label: 'Tin tức', icon: 'bi bi-newspaper' },
 ]
 </script>
 
