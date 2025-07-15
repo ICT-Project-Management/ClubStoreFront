@@ -109,7 +109,7 @@ const handleClickNews = (id: number | string) => {
 
 <template>
   <Header />
-  <div class="container-fluid h-100" style="padding-top: 64px;">
+  <div class="container-fluid h-100 min-vh-100" style="padding-top: 64px;">
     <div class="container me-lg-300 py-4">
       <div class="d-flex justify-content-center mb-4">
         <ul class="nav nav-pills bg-white shadow-sm px-2 py-2 rounded-pill gap-2">

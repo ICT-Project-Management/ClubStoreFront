@@ -47,7 +47,7 @@ onMounted(fetchNews)
 <template>
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="fw-bold">📰 Quản lý Tin tức</h2>
+      <h2 class="fw-bold">Quản lý Tin tức</h2>
       <button @click="goToCreate" class="btn btn-success">
         ➕ Thêm tin tức
       </button>

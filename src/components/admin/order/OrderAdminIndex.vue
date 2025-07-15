@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getOrders, updateStatus } from '../../../services/admin/orderAdminService'
-
+import { getOrders, updateStatus, downloadOrderDoc} from '../../../services/admin/orderAdminService'
+import { useToast } from 'vue-toastification'
+import ExportExcel from './ExportExcel.vue';
+const toast = useToast();
 const filters = ref({
   date_from: '',
   date_to: '',
@@ -49,7 +51,13 @@ const formatDate = (str: string) => {
     .toString().padStart(2, '0')}/${d.getFullYear()} ${d.getHours()
     .toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
 }
-
+const handleDownloadOrder = async (orderId: number) => {
+  try {
+    await downloadOrderDoc(orderId)
+  } catch (error) {
+    toast.warning('Download file error!!!!');
+  }
+}
 onMounted(fetchOrders)
 </script>
 
@@ -58,7 +66,7 @@ onMounted(fetchOrders)
     <h2 class="mb-4 text-dark">Quản lý đơn hàng</h2>
 
     <!-- BỘ LỌC -->
-    <div class="card p-3 mb-4 shadow-sm">
+    <div class="card p-3 mb-1 shadow-sm">
       <div class="row g-3">
         <div class="col-md-3">
           <label>Ngày bắt đầu</label>
@@ -83,7 +91,7 @@ onMounted(fetchOrders)
     </div>
 
     <div v-if="message" class="alert alert-info text-center">{{ message }}</div>
-
+    <ExportExcel class="mb-1"/>
     <!-- BẢNG -->
     <table class="table table-bordered align-middle">
       <thead class="table-light text-center">
@@ -126,10 +134,17 @@ onMounted(fetchOrders)
                   <option v-if="['delivering','delivered'].includes(order.status)" value="completed">Hoàn tất</option>
                 </select>
                 <button class="btn btn-sm btn-outline-success" @click="handleUpdate(order.id)" :disabled="!selectedStatus[order.id]">
-                  ✅
+                  Cập nhật
                 </button>
               </template>
               <span v-else class="text-muted"></span>
+              <button
+                class="btn btn-sm btn-outline-dark d-inline-flex align-items-center gap-1 ms-3"
+                @click="handleDownloadOrder(order.id)"
+                title="Tải file Word đơn hàng"
+              >
+                🖨️ <span>In đơn</span>
+              </button>
             </td>
           </tr>
 

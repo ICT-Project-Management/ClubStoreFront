@@ -115,6 +115,7 @@ const colors = [
     { id: 10, name: 'Maroon' },
     { id: 11, name: 'Olive' },
     { id: 12, name: 'Navy' },
+    { id: 48, name: 'Dark Salmon'},
 ]
 
 const sizes = [

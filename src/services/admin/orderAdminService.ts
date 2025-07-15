@@ -38,3 +38,45 @@ export const getOrders = (filters: {
 export const updateStatus = (id: number, status: string) => {
   return axios.put(`${API}/order/list/${id}`, { status }, getAuthHeaders())
 }
+
+export const downloadOrderDoc = async (orderId: number) => {
+  const auth = useAuthStore()
+  const response = await axios.get(`${API}/orders/${orderId}/export-doc`, {
+    headers: {
+      Authorization: `Bearer ${auth.token}`,
+    },
+    responseType: 'blob',
+  })
+  const blob = new Blob([response.data], {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  })
+
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = `order_${orderId}.docx`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+export const downloadMonthlyOrderExcel = async (month: string) => {
+  const auth = useAuthStore()
+  const response = await axios.get(`${API}/orders/export-excel`, {
+    headers: {
+      Authorization: `Bearer ${auth.token}`,
+    },
+    params: { month },
+    responseType: 'blob',
+  })
+
+  const blob = new Blob([response.data], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  })
+
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = `orders_${month}.xlsx`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}

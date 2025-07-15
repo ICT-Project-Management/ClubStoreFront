@@ -65,7 +65,7 @@ onMounted(fetchLatestNews)
 
       <div class="text-end mt-3">
         <button class="btn btn-outline-info btn-sm" @click="handleNewsPage">
-          Xem thêm tin tức
+          Trang tin tức
         </button>
       </div>
     </div>

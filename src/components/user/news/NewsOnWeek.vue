@@ -47,7 +47,8 @@ onMounted(fetchWeeklyNews)
             </td>
             <td class="text-truncate-title">
                 <div class="fw-semibold">{{ item.title }}</div>
-                <small class="text-muted">{{ formatDate(item.created_at) }}</small>
+                <small class="text-muted">{{ formatDate(item.created_at) }}</small><br>
+                <small>{{ item.description }}</small>
             </td>
           </tr>
         </tbody>
