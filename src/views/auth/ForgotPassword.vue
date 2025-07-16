@@ -1,25 +1,25 @@
 <template>
   <div class="forgot-password-wrapper">
     <div class="form-container shadow p-5 bg-white rounded">
-      <h3 class="text-center text-primary mb-4">🔑 Quên mật khẩu</h3>
+      <h3 class="text-center text-primary mb-4">🔑 {{ $t('fogot_password.title') }}</h3>
 
       <form @submit.prevent="handleSubmit">
         <div class="mb-3">
-          <label class="form-label fw-semibold">Email</label>
+          <label class="form-label fw-semibold">{{ $t('fogot_password.email') }}</label>
           <input
             v-model="email"
             type="email"
             class="form-control"
-            placeholder="Nhập email đã đăng ký"
+            :placeholder="$t('fogot_password.description')"
             required
           />
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">Gửi liên kết đặt lại mật khẩu</button>
+        <button type="submit" class="btn btn-primary w-100">{{ $t('fogot_password.submit') }}</button>
       </form>
 
       <div class="text-center mt-3">
-        <router-link to="/login" class="text-decoration-none text-secondary">← Quay lại đăng nhập</router-link>
+        <router-link to="/login" class="text-decoration-none text-secondary">← {{ $t('fogot_password.back') }}</router-link>
       </div>
     </div>
   </div>
@@ -28,7 +28,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useToast } from 'vue-toastification'
-
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const email = ref('')
 const toast = useToast()
 
@@ -45,13 +46,13 @@ const handleSubmit = async () => {
     const data = await res.json()
 
     if (res.status === 200) {
-      toast.success(data.message|| 'Have sent reset password link to your email!')
+      toast.success(t('fogot_password.success') || 'Password reset link sent successfully.')
       email.value = ''
     } else {
       toast.warning(data.message || 'Email don not exist or not registered.')
     }
   } catch (error) {
-    toast.error('Check your network connection and try again.')
+    toast.error(t('fogot_password.error') || 'An error occurred while sending the reset link.')
     console.error(error)
   }
 }

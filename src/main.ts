@@ -6,6 +6,7 @@ import { createPinia } from 'pinia'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import  i18n  from './i18n.ts'
 createApp(App)
 .use(router)
 .use(createPinia())
@@ -19,5 +20,6 @@ createApp(App)
   hideProgressBar: false,
   newestOnTop: true,
 })
+.use(i18n)
 .mount('#app')
 

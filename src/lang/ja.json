@@ -1,0 +1,63 @@
+{
+  "login": {
+    "title": "🔐 ログイン",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "login_button": "ログイン",
+    "forgot": "パスワードをお忘れですか？",
+    "or_login_with": "または次でログイン",
+    "google": "Google",
+    "facebook": "Facebook",
+    "no_account": "アカウントをお持ちではありませんか？",
+    "register": "登録する",
+    "error": "ログインに失敗しました。メールアドレスとパスワードをご確認ください。",
+    "google_error": "Googleでのログイン中にエラーが発生しました",
+    "facebook_error": "Facebookでのログイン中にエラーが発生しました"
+  },
+  "register": {
+    "title": "アカウント登録",
+    "name": "氏名",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "confirm_password": "パスワード確認",
+    "phone": "電話番号",
+    "city": "市区町村",
+    "provine": "都道府県",
+    "house_code": "番地・建物名",
+    "address": "住所",
+    "avatar": "プロフィール画像",
+    "submit": "登録する",
+    "already_have_account": "すでにアカウントをお持ちですか？",
+    "login_link": "ログイン",
+    "password_mismatch": "パスワードと確認が一致しません！",
+    "failed": "登録に失敗しました！"
+  },
+  "fogot_password": {
+    "title": "パスワードをお忘れですか",
+    "email": "メールアドレス",
+    "description": "登録済みのメールアドレスを入力してください。",
+    "submit": "パスワードリセットリンクを送信",
+    "back": "ログインに戻る",
+    "success": "パスワードリセットリンクがメールに送信されました。",
+    "error": "このメールアドレスでのアカウントが見つかりません。"
+  },
+  "reset_password": {
+    "title": "パスワードリセット",
+    "new_password": "新しいパスワード",
+    "confirm_new_password": "新しいパスワードの確認",
+    "submit": "パスワードをリセット",
+    "success": "パスワードが正常にリセットされました。",
+    "error": "パスワードのリセットに失敗しました。もう一度お試しください。"
+  },
+  "admin_bar": {
+    "title": "システム管理",
+    "dashboard": "ダッシュボード",
+    "users": "ユーザー",
+    "products": "製品",
+    "orders": "注文",
+    "settings": "設定",
+    "logout": "ログアウト",
+    "goHome": "ホーム",
+    "news": "ニュース"
+  }
+}

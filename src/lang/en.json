@@ -1,0 +1,63 @@
+{
+  "login": {
+    "title": "🔐 Login",
+    "email": "Email",
+    "password": "Password",
+    "login_button": "Login",
+    "forgot": "Forgot password?",
+    "or_login_with": "Or login with",
+    "google": "Google",
+    "facebook": "Facebook",
+    "no_account": "Don't have an account?",
+    "register": "Register",
+    "error": "Login failed! Please check your email and password.",
+    "google_error": "Error logging in with Google",
+    "facebook_error": "Error logging in with Facebook"
+  },
+  "register": {
+    "title": "Create an Account",
+    "name": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "phone": "Phone Number",
+    "city": "City",
+    "provine": "Province",
+    "house_code": "House Number",
+    "address": "Address",
+    "avatar": "Profile Picture",
+    "submit": "Register",
+    "already_have_account": "Already have an account?",
+    "login_link": "Login",
+    "password_mismatch": "Password and confirmation do not match!",
+    "failed": "Registration failed!"
+  },
+  "fogot_password": {
+    "title": "Forgot Password",
+    "email": "Email",
+    "description": "Enter your registered email.",
+    "submit": "Send Password Reset Link",
+    "back": "Back to Login",
+    "success": "Password reset link has been sent to your email.",
+    "error": "No account found with this email."
+  },
+  "reset_password": {
+    "title": "Reset Password",
+    "new_password": "New Password",
+    "confirm_new_password": "Confirm New Password",
+    "submit": "Reset Password",
+    "success": "Password has been successfully reset.",
+    "error": "Failed to reset password. Please try again."
+  },
+  "admin_bar": {
+    "title": "System Administration",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "products": "Products",
+    "orders": "Orders",
+    "settings": "Settings",
+    "logout": "Logout",
+    "goHome": "Home",
+    "news": "News"
+  }
+}

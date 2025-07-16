@@ -6,22 +6,34 @@
           <img src="../../assets/vue.svg" alt="Logo" class="logo-blur" />
         </div>
       </div>
+
       <div class="col-md-6 bg-white p-5">
-        <h3 class="text-center text-primary mb-4">🔐 Đăng nhập</h3>
+    
+        <div class="mb-3 text-end">
+          <LangSwitcher />
+        </div>
+
+        <h3 class="text-center text-primary mb-4">{{ $t('login.title') }}</h3>
         <form @submit.prevent="handleLogin">
           <div class="mb-3">
-            <label class="form-label fw-semibold">Email</label>
-            <input v-model="form.email" type="email" class="form-control" placeholder="Nhập email" required />
+            <label class="form-label fw-semibold">{{ $t('login.email') }}</label>
+            <input
+              v-model="form.email"
+              type="email"
+              class="form-control"
+              :placeholder="$t('login.email')"
+              required
+            />
           </div>
 
           <div class="mb-3 position-relative">
-            <label class="form-label fw-semibold">Mật khẩu</label>
+            <label class="form-label fw-semibold">{{ $t('login.password') }}</label>
             <div class="input-group">
               <input
                 :type="showPassword ? 'text' : 'password'"
                 class="form-control"
                 v-model="form.password"
-                placeholder="Nhập mật khẩu"
+                :placeholder="$t('login.password')"
                 required
               />
               <span class="input-group-text" style="cursor: pointer" @click="showPassword = !showPassword">
@@ -30,28 +42,33 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100 mt-3">Đăng nhập</button>
+          <button type="submit" class="btn btn-primary w-100 mt-3">
+            {{ $t('login.login_button') }}
+          </button>
+
           <div class="text-end mt-2">
             <router-link to="/forgot-password" class="text-decoration-none text-primary">
-              Quên mật khẩu?
+              {{ $t('login.forgot') }}
             </router-link>
           </div>
 
           <div class="text-center mt-3">
-            <p class="mb-1">Hoặc đăng nhập bằng</p>
+            <p class="mb-1">{{ $t('login.or_login_with') }}</p>
             <div class="d-flex justify-content-center gap-3">
               <button type="button" class="btn btn-outline-danger w-50" @click="loginWithGoogle">
-                <i class="bi bi-google me-2"></i> Google
+                <i class="bi bi-google me-2"></i> {{ $t('login.google') }}
               </button>
               <button type="button" class="btn btn-outline-primary w-50" @click="loginWithFacebook">
-                <i class="bi bi-facebook me-2"></i> Facebook
+                <i class="bi bi-facebook me-2"></i> {{ $t('login.facebook') }}
               </button>
             </div>
           </div>
 
           <p class="text-center mt-3">
-            Chưa có tài khoản?
-            <router-link to="/register" class="text-decoration-none fw-semibold text-primary">Đăng ký</router-link>
+            {{ $t('login.no_account') }}
+            <router-link to="/register" class="text-decoration-none fw-semibold text-primary">
+              {{ $t('login.register') }}
+            </router-link>
           </p>
         </form>
       </div>
@@ -62,55 +79,53 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../store/auth'
 import { useToast } from 'vue-toastification'
+import LangSwitcher from '../../lang/LangSwitcher.vue'
+
 const toast = useToast()
+const router = useRouter()
+const auth = useAuthStore()
+const { t } = useI18n()
+
 const form = ref({
   email: '',
   password: '',
 })
 const showPassword = ref(false)
-
-const router = useRouter()
-const auth = useAuthStore()
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const handleLogin = async () => {
   try {
     await auth.login(form.value)
-
     const roles = auth.user?.roles || []
     const isAdmin = roles.some((r: any) => r.name === 'admin')
-
     router.push(isAdmin ? '/admin' : '/')
   } catch (err) {
-    toast.error('Đăng nhập thất bại! Kiểm tra email và mật khẩu.')
+    toast.error(t('login.error'))
     console.error(err)
   }
 }
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const loginWithGoogle = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/auth/google/redirect`, {
-      method: 'POST',
-    })
+    const res = await fetch(`${API_BASE_URL}/auth/google/redirect`, { method: 'POST' })
     const data = await res.json()
     if (data.url) window.location.href = data.url
   } catch (error) {
-    toast.error('Lỗi khi đăng nhập với Google')
+    toast.error(t('login.google_error'))
     console.error(error)
   }
 }
 
 const loginWithFacebook = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/auth/facebook/redirect`, {
-      method: 'POST',
-    })
+    const res = await fetch(`${API_BASE_URL}/auth/facebook/redirect`, { method: 'POST' })
     const data = await res.json()
     if (data.url) window.location.href = data.url
   } catch (error) {
-    toast.error('Lỗi khi đăng nhập với Facebook')
+    toast.error(t('login.facebook_error'))
     console.error(error)
   }
 }

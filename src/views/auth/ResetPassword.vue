@@ -1,7 +1,10 @@
 <template>
   <div class="reset-wrapper">
     <div class="form-container shadow p-5 bg-white rounded">
-      <h3 class="text-center text-primary mb-4">🔒 Đặt lại mật khẩu</h3>
+      <div class="mb-3 text-end">
+        <LangSwitcher />
+      </div>
+      <h3 class="text-center text-primary mb-4">🔒 {{ $t('reset_password.title') }}</h3>
 
       <form @submit.prevent="handleReset">
         <input type="hidden" v-model="form.token" />
@@ -12,20 +15,20 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label fw-semibold">Mật khẩu mới</label>
+          <label class="form-label fw-semibold">{{ $t('reset_password.new_password') }}</label>
           <input v-model="form.password" type="password" class="form-control" required />
         </div>
 
         <div class="mb-3">
-          <label class="form-label fw-semibold">Xác nhận mật khẩu</label>
+          <label class="form-label fw-semibold">{{ $t('reset_password.confirm_new_password') }}</label>
           <input v-model="form.password_confirmation" type="password" class="form-control" required />
         </div>
 
-        <button type="submit" class="btn btn-success w-100">Xác nhận đặt lại mật khẩu</button>
+        <button type="submit" class="btn btn-success w-100">{{ $t('reset_password.submit') }}</button>
       </form>
 
       <div class="text-center mt-3">
-        <router-link to="/login" class="text-decoration-none text-secondary">← Quay lại đăng nhập</router-link>
+        <router-link to="/login" class="text-decoration-none text-secondary">← {{ $t('fogot_password.back') }}</router-link>
       </div>
     </div>
   </div>
@@ -35,7 +38,10 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import { useI18n } from 'vue-i18n'
+import LangSwitcher from '../../lang/LangSwitcher.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
@@ -70,13 +76,13 @@ const handleReset = async () => {
     const data = await res.json()
 
     if (res.status === 200) {
-      toast.success(data.message || 'Password reset successful!')
+      toast.success(t('reset_password.success') || 'Password reset successfully!')
       router.push('/login')
     } else {
       toast.warning(data.message || 'Password reset failed. Please check your token and email.')
     }
   } catch (error) {
-    toast.error('Failed to reset password. Please try again later.')
+    toast.error(t('reset_password.error') || 'An error occurred while resetting the password.')
     console.error(error)
   }
 }
