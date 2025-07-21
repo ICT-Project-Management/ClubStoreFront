@@ -25,6 +25,7 @@ import ResetPassword from '../views/auth/ResetPassword.vue'
 import NewsAdmin from '../components/admin/news/NewsAdmin.vue'
 import CreateNews from '../components/admin/news/CreateNews.vue'
 import AllNews from '../components/user/news/AllNews.vue'
+import VNpayReturn from '../components/user/orders/VNpayReturn.vue'
 
 const routes = [
   { path: '/', component: Home },
@@ -80,6 +81,10 @@ const routes = [
     path: '/view/all-news',
     component: AllNews,
   },
+  {
+  path: '/payment/vnpay/return',
+  component: VNpayReturn
+}
 ]
 
 const router = createRouter({
@@ -87,17 +92,9 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach(async(to, from, next) => {
-   const auth = useAuthStore()
+router.beforeEach((to, from, next) => {
+  const auth = useAuthStore()
 
-  if (auth.token && !auth.user) {
-    try {
-      await auth.init()
-    } catch (e) {
-      auth.logout()
-      return next('/login')
-    }
-  }
   const roles = auth.user?.roles || []
   const isAdmin = roles.some((r: any) => r.name === 'admin')
 
@@ -111,5 +108,6 @@ router.beforeEach(async(to, from, next) => {
 
   next()
 })
+
 
 export default router

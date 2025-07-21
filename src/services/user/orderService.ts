@@ -20,8 +20,8 @@ export const updateAddress = (data: any) => {
   return axios.post(`${API}/user/address`, data, getAuthHeaders())
 }
 
-export const addOrders = () => {
-  return axios.post(`${API}/user/order`, {}, getAuthHeaders())
+export const addOrders = (data: any) => {
+  return axios.post(`${API}/user/order`, data, getAuthHeaders())
 }
 
 export const getOrders = () => {

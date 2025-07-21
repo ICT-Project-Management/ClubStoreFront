@@ -4,6 +4,7 @@ import { getAddress, updateAddress, addOrders } from '../../../services/user/ord
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import Header from '../../../layouts/header/Header.vue'
+
 const toast = useToast()
 const router = useRouter()
 
@@ -14,6 +15,7 @@ const address = ref({
   address: ''
 })
 
+const paymentMethod = ref('cod')
 const message = ref('')
 const loading = ref(false)
 
@@ -41,11 +43,16 @@ const handleUpdate = async () => {
 
 const handleOrder = async () => {
   try {
-    await addOrders()
-    toast.success('🛒 Đặt hàng thành công!')
-    router.push('/') 
+    const res = await addOrders({ payment_method: paymentMethod.value })
+
+    if (paymentMethod.value === 'vnpay' && res.data?.payment_url) {
+      window.location.href = res.data.payment_url
+    } else {
+      toast.success('Đặt hàng thành công!')
+      router.push('/')
+    }
   } catch (err) {
-    toast.error('❌ Đặt hàng thất bại!')
+    toast.error('Đặt hàng thất bại!')
     console.error(err)
   }
 }
@@ -54,7 +61,7 @@ onMounted(fetchAddress)
 </script>
 
 <template>
-    <Header />
+  <Header />
   <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
     <div class="bg-white p-5 rounded shadow w-100" style="max-width: 600px">
       <h3 class="mb-4 text-center">📦 Thông tin giao hàng</h3>
@@ -77,6 +84,94 @@ onMounted(fetchAddress)
       <div class="mb-3">
         <label class="form-label">Địa chỉ chi tiết</label>
         <input v-model="address.address" type="text" class="form-control" placeholder="VD: Số 12A, Phúc Xá, Ba Đình" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label mb-2">Phương thức thanh toán</label>
+        <div class="d-flex flex-column gap-2">
+          <div
+            class="form-check form-check-inline p-3 rounded"
+            :class="{
+              'border border-2 border-info bg-light': paymentMethod === 'cod',
+              'border': paymentMethod !== 'cod'
+            }"
+          >
+            <input
+              class="form-check-input"
+              type="radio"
+              id="cod"
+              value="cod"
+              v-model="paymentMethod"
+            />
+            <label class="form-check-label ms-2" for="cod">
+              <i class="bi bi-wallet"></i>
+               Thanh toán khi nhận hàng (COD)
+            </label>
+          </div>
+
+          <div
+            class="form-check form-check-inline p-3 rounded"
+            :class="{
+              'border border-2 border-info bg-light': paymentMethod === 'vnpay',
+              'border': paymentMethod !== 'vnpay'
+            }"
+          >
+            <input
+              class="form-check-input"
+              type="radio"
+              id="vnpay"
+              value="vnpay"
+              v-model="paymentMethod"
+            />
+            <label class="form-check-label d-flex align-items-center gap-2 ms-2" for="vnpay">
+              <img
+                src="../../../assets/vnpay.png"
+                alt="VNPay"
+                style="height: 24px"
+              />
+              Thanh toán qua VNPay
+            </label>
+          </div>
+
+          <div
+            class="form-check form-check-inline p-3 rounded"
+            :class="{
+              'border border-2 border-info bg-light': paymentMethod === 'qr',
+              'border': paymentMethod !== 'qr'
+            }"
+          >
+            <input
+              class="form-check-input"
+              type="radio"
+              id="qr"
+              value="qr"
+              v-model="paymentMethod"
+            />
+            <label class="form-check-label ms-2" for="qr">
+              <i class="bi bi-qr-code"></i>
+               Quét mã QR
+            </label>
+          </div>
+
+          <div
+            class="form-check form-check-inline p-3 rounded"
+            :class="{
+              'border border-2 border-info bg-light': paymentMethod === 'bank',
+              'border': paymentMethod !== 'bank'
+            }"
+          >
+            <input
+              class="form-check-input"
+              type="radio"
+              id="bank"
+              value="bank"
+              v-model="paymentMethod"
+            />
+            <label class="form-check-label ms-2" for="bank">
+              <i class="bi bi-credit-card-2-front"></i>
+               Chuyển khoản ngân hàng
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="mb-3 text-success fw-bold" v-if="message">{{ message }}</div>

@@ -27,6 +27,7 @@ export const getOrders = (filters: {
   date_to?: string
   price_min?: string | number
   price_max?: string | number
+  page?: number
 } = {}) => {
   const queryParams = buildQuery(filters)
   return axios.get(`${API}/order/list`, {

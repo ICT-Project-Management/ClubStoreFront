@@ -46,17 +46,20 @@
       </div>
 
       <button type="submit" class="btn btn-outline-primary w-100">Thêm chi tiết</button>
+      <div class="text-end mt-3">
+        <router-link to="/admin/products" class="btn btn-outline-secondary btn-sm">
+          Quay lại danh sách sản phẩm
+        </router-link>
+      </div>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { getAllClothes, fetchAddDetailClothes } from '../../../services/admin/productAdminService'
 import { useToast } from 'vue-toastification'
 const toast = useToast()
-const router = useRouter()
 
 const form = ref({
   products_clothes_id: '',
@@ -93,7 +96,13 @@ const handleSubmit = async () => {
   try {
     await fetchAddDetailClothes(formData)
     toast.success('Thêm chi tiết thành công!')
-    router.push('/admin/products')
+    form.value = {
+      products_clothes_id: '',
+      size_id: '',
+      color_id: '',
+      stock: 0,
+      image: null as File | null,
+    }
   } catch (err) {
     toast.error('Lỗi khi thêm chi tiết !')
     console.error(err)

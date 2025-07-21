@@ -11,12 +11,7 @@
         <span class="fw-bold text fs-4">ClubStore</span>
       </router-link>
 
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#mainNavbar"
-      >
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
 
@@ -63,9 +58,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <template v-if="auth.user">
-                <li>
-                  <span class="dropdown-item-text fw-bold">{{ auth.user.name }}</span>
-                </li>
+                <li><span class="dropdown-item-text fw-bold">{{ auth.user.name }}</span></li>
                 <li><hr class="dropdown-divider" /></li>
                 <li>
                   <button class="dropdown-item" @click="handleLogout">
@@ -94,22 +87,26 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '../../store/auth'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../../store/auth'
 import { useCartStore } from '../../store/cart'
-const cartStore = useCartStore()
-
-const toggleCart = () => {
-  cartStore.toggleCart()
-}
 
 const auth = useAuthStore()
+const cartStore = useCartStore()
 const router = useRouter()
+
+const toggleCart = () => cartStore.toggleCart()
 
 const handleLogout = () => {
   auth.logout()
   router.push('/login')
 }
+
+// Fetch user nếu chưa có
+onMounted(() => {
+  auth.fetchUser()
+})
 </script>
 
 <style scoped>

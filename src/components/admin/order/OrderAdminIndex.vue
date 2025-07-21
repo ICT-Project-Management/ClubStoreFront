@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getOrders, updateStatus, downloadOrderDoc} from '../../../services/admin/orderAdminService'
+import { getOrders, updateStatus, downloadOrderDoc } from '../../../services/admin/orderAdminService'
 import { useToast } from 'vue-toastification'
-import ExportExcel from './ExportExcel.vue';
-const toast = useToast();
+import ExportExcel from './ExportExcel.vue'
+import Pagination from '../../../layouts/paginate/Paginate.vue'
+
+const toast = useToast()
+
 const filters = ref({
   date_from: '',
   date_to: '',
@@ -12,17 +15,22 @@ const filters = ref({
 })
 
 const orders = ref<any[]>([])
+const currentPage = ref(1)
+const lastPage = ref(1)
 const expandedOrderId = ref<number | null>(null)
 const selectedStatus = ref<Record<number, string>>({})
 const message = ref('')
 
-const fetchOrders = async () => {
+const fetchOrders = async (page = 1) => {
   try {
-    const query = Object.fromEntries(
-      Object.entries(filters.value).filter(([_, v]) => v !== '' && v !== null)
-    )
+    const query = {
+      ...Object.fromEntries(Object.entries(filters.value).filter(([_, v]) => v !== '' && v !== null)),
+      page
+    }
     const res = await getOrders(query)
-    orders.value = res.data
+    orders.value = res.data.data
+    currentPage.value = res.data.current_page
+    lastPage.value = res.data.last_page
   } catch (err) {
     console.error('Lỗi khi lấy danh sách đơn:', err)
   }
@@ -34,7 +42,7 @@ const handleUpdate = async (orderId: number) => {
   try {
     await updateStatus(orderId, status)
     message.value = '✅ Cập nhật trạng thái thành công'
-    await fetchOrders()
+    await fetchOrders(currentPage.value)
   } catch (err) {
     console.error(err)
     message.value = '❌ Lỗi khi cập nhật trạng thái'
@@ -47,25 +55,29 @@ const toggleDetails = (id: number) => {
 
 const formatDate = (str: string) => {
   const d = new Date(str)
-  return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1)
-    .toString().padStart(2, '0')}/${d.getFullYear()} ${d.getHours()
-    .toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
+  return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
 }
+
 const handleDownloadOrder = async (orderId: number) => {
   try {
     await downloadOrderDoc(orderId)
   } catch (error) {
-    toast.warning('Download file error!!!!');
+    toast.warning('Download file error!')
   }
 }
-onMounted(fetchOrders)
+
+const handleChangePage = (page: number) => {
+  fetchOrders(page)
+}
+
+onMounted(() => fetchOrders())
 </script>
 
 <template>
   <div class="container py-4">
     <h2 class="mb-4 text-dark">Quản lý đơn hàng</h2>
 
-    <!-- BỘ LỌC -->
+    <!-- FILTER -->
     <div class="card p-3 mb-1 shadow-sm">
       <div class="row g-3">
         <div class="col-md-3">
@@ -86,13 +98,14 @@ onMounted(fetchOrders)
         </div>
       </div>
       <div class="text-end mt-3">
-        <button class="btn btn-primary" @click="fetchOrders">🔍 Lọc</button>
+        <button class="btn btn-primary" @click="fetchOrders(1)">🔍 Lọc</button>
       </div>
     </div>
 
-    <div v-if="message" class="alert alert-info text-center">{{ message }}</div>
-    <ExportExcel class="mb-1"/>
-    <!-- BẢNG -->
+    <div v-if="message" class="alert alert-info text-center mt-2">{{ message }}</div>
+    <ExportExcel class="mb-2" />
+
+    <!-- TABLE -->
     <table class="table table-bordered align-middle">
       <thead class="table-light text-center">
         <tr>
@@ -110,13 +123,15 @@ onMounted(fetchOrders)
             <td>{{ formatDate(order.created_at) }}</td>
             <td>{{ order.total_price.toLocaleString() }}đ</td>
             <td>
-              <span class="badge"
+              <span
+                class="badge"
                 :class="{
                   'bg-warning text-dark': order.status === 'pending',
                   'bg-info text-dark': order.status === 'delivering',
                   'bg-success': ['delivered', 'completed'].includes(order.status),
                   'bg-danger': order.status === 'cancelled'
-                }">
+                }"
+              >
                 {{ order.status }}
               </span>
             </td>
@@ -124,35 +139,33 @@ onMounted(fetchOrders)
               <button class="btn btn-sm btn-outline-info me-2" @click="toggleDetails(order.id)">
                 {{ expandedOrderId === order.id ? 'Ẩn' : 'Chi tiết' }}
               </button>
+
               <template v-if="!['completed', 'cancelled'].includes(order.status)">
                 <select class="form-select form-select-sm d-inline w-auto me-1" v-model="selectedStatus[order.id]">
                   <option disabled value="">--Chọn--</option>
                   <option v-if="order.status === 'pending'" value="delivering">Đang giao</option>
                   <option v-if="order.status === 'pending'" value="cancelled">Huỷ</option>
                   <option v-if="order.status === 'delivering'" value="delivered">Đã giao</option>
-                  <option v-if="order.status === 'delivering'" value="cancelled">Hủy</option>
+                  <option v-if="order.status === 'delivering'" value="cancelled">Huỷ</option>
                   <option v-if="['delivering','delivered'].includes(order.status)" value="completed">Hoàn tất</option>
                 </select>
                 <button class="btn btn-sm btn-outline-success" @click="handleUpdate(order.id)" :disabled="!selectedStatus[order.id]">
                   Cập nhật
                 </button>
               </template>
-              <span v-else class="text-muted"></span>
-              <button
-                class="btn btn-sm btn-outline-dark d-inline-flex align-items-center gap-1 ms-3"
-                @click="handleDownloadOrder(order.id)"
-                title="Tải file Word đơn hàng"
-              >
+
+              <button class="btn btn-sm btn-outline-dark d-inline-flex align-items-center gap-1 ms-3"
+                @click="handleDownloadOrder(order.id)">
                 🖨️ <span>In đơn</span>
               </button>
             </td>
           </tr>
 
-          <!-- CHI TIẾT -->
+          <!-- DETAIL -->
           <tr v-if="expandedOrderId === order.id">
             <td colspan="5">
               <div class="row g-4">
-                <!-- Quần áo -->
+                <!-- Clothes -->
                 <div class="col-md-6">
                   <h6 class="text-primary">👕 Sản phẩm quần áo</h6>
                   <div v-if="order.detail_clothes_orders?.length" class="d-flex flex-column gap-2">
@@ -161,13 +174,8 @@ onMounted(fetchOrders)
                       :key="item.id"
                       class="d-flex align-items-center gap-3 border rounded p-2 shadow-sm"
                     >
-                      <img
-                        :src="item.detail_clothes.image.url_img"
-                        alt="clothes"
-                        width="60"
-                        height="60"
-                        class="rounded border object-fit-cover"
-                      />
+                      <img :src="item.detail_clothes.image.url_img" width="60" height="60"
+                        class="rounded border object-fit-cover" />
                       <div>
                         <strong>{{ item.detail_clothes.product_clothes.name }}</strong><br />
                         <small>Size: {{ item.detail_clothes.size.name }},</small>
@@ -176,10 +184,9 @@ onMounted(fetchOrders)
                       </div>
                     </div>
                   </div>
-                  <p v-else class="text-muted"></p>
                 </div>
 
-                <!-- Quà lưu niệm -->
+                <!-- Presents -->
                 <div class="col-md-6">
                   <h6 class="text-success">🎁 Sản phẩm quà lưu niệm</h6>
                   <div v-if="order.detail_present_orders?.length" class="d-flex flex-column gap-2">
@@ -188,20 +195,14 @@ onMounted(fetchOrders)
                       :key="item.id"
                       class="d-flex align-items-center gap-3 border rounded p-2 shadow-sm"
                     >
-                      <img
-                        :src="item.detail_present.image.url_img"
-                        alt="present"
-                        width="60"
-                        height="60"
-                        class="rounded border object-fit-cover"
-                      />
+                      <img :src="item.detail_present.image.url_img" width="60" height="60"
+                        class="rounded border object-fit-cover" />
                       <div>
                         <strong>{{ item.detail_present.product_present.name }}</strong><br />
                         <small>SL: {{ item.quantity }}</small>
                       </div>
                     </div>
                   </div>
-                  <p v-else class="text-muted"></p>
                 </div>
               </div>
             </td>
@@ -209,6 +210,13 @@ onMounted(fetchOrders)
         </template>
       </tbody>
     </table>
+
+    <!-- PAGINATION -->
+    <Pagination
+      :current-page="currentPage"
+      :last-page="lastPage"
+      @change-page="handleChangePage"
+    />
   </div>
 </template>
 
