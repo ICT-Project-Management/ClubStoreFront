@@ -26,6 +26,8 @@ const navItems = computed(() => [
   { path: '/admin/home', label: t('admin_bar.goHome'), icon: 'bi bi-house-door' },
   { path: '/admin/users', label: t('admin_bar.users'), icon: 'bi bi-people' },
   { path: '/admin/products', label: t('admin_bar.products'), icon: 'bi bi-box-seam' },
+  { path: '/admin/colors', label: t('admin.product.manage_colors'), icon: 'bi bi-palette' },
+  { path: '/admin/sizes', label: t('admin.product.manage_sizes'), icon: 'bi bi-arrows-fullscreen' },
   { path: '/admin/orders', label: t('admin_bar.orders'), icon: 'bi bi-receipt' },
   { path: '/admin/news', label: t('admin_bar.news'), icon: 'bi bi-newspaper' },
 ])

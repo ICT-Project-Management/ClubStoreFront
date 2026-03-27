@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { newsService } from '../../../services/newsService'
 import Paginate from '../../../layouts/paginate/Paginate.vue'
 import { useToast } from 'vue-toastification'
 
 const toast = useToast()
 const router = useRouter()
+const { t } = useI18n()
 
 const newsList = ref<any[]>([])
 const meta = ref({ current_page: 1, last_page: 1 })
@@ -25,7 +27,7 @@ const handleSearch = () => {
 }
 
 const handleDelete = async (id: number) => {
-  if (confirm('Bạn có chắc chắn muốn xoá tin này?')) {
+  if (confirm('' + t('admin.news.confirm_delete') + '')) {
     await newsService.deleteNews(id)
     toast.success('Delete suscessfully !')
     fetchNews()
@@ -47,9 +49,9 @@ onMounted(fetchNews)
 <template>
   <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="fw-bold">Quản lý Tin tức</h2>
+      <h2 class="fw-bold">{{ $t('admin.news.manage') }}</h2>
       <button @click="goToCreate" class="btn btn-success">
-        ➕ Thêm tin tức
+        {{ $t('admin.news.add') }}
       </button>
     </div>
 
@@ -58,10 +60,10 @@ onMounted(fetchNews)
       <input
         type="text"
         class="form-control"
-        placeholder="Tìm theo tiêu đề..."
+        :placeholder="$t('admin.news.search_title')"
         v-model="filters.title"
       />
-      <button class="btn btn-primary" @click="handleSearch">Tìm</button>
+      <button class="btn btn-primary" @click="handleSearch">{{ $t('admin.news.search_btn') }}</button>
     </div>
 
     <!-- Bảng danh sách -->
@@ -69,13 +71,13 @@ onMounted(fetchNews)
     <table class="table table-bordered align-middle text-center">
         <thead class="table-light">
         <tr>
-            <th>Id</th>
-            <th>Ảnh</th>
-            <th class="text-start">Tiêu đề</th>
-            <th class="text-start">Mô tả</th>
-            <th class="text-start">Nội dung</th>
-            <th>Ngày tạo</th>
-            <th>Thao tác</th>
+            <th>{{ $t('admin.news.table_id') }}</th>
+            <th>{{ $t('admin.news.table_image') }}</th>
+            <th class="text-start">{{ $t('admin.news.table_title') }}</th>
+            <th class="text-start">{{ $t('admin.news.table_desc') }}</th>
+            <th class="text-start">{{ $t('admin.news.table_content') }}</th>
+            <th>{{ $t('admin.news.table_date') }}</th>
+            <th>{{ $t('admin.news.table_action') }}</th>
         </tr>
         </thead>
         <tbody>
@@ -100,12 +102,12 @@ onMounted(fetchNews)
                 @click="handleDelete(item.id)"
                 class="btn btn-sm btn-outline-danger"
             >
-                Xoá
+                {{ $t('admin.news.delete') }}
             </button>
             </td>
         </tr>
         <tr v-if="newsList.length === 0">
-            <td colspan="7" class="text-center text-muted py-3">Không có tin tức nào.</td>
+            <td colspan="7" class="text-center text-muted py-3">{{ $t('admin.news.no_news') }}</td>
         </tr>
         </tbody>
     </table>

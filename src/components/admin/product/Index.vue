@@ -2,19 +2,19 @@
   <div>
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="fw-bold">Quản lý sản phẩm</h4>
+      <h4 class="fw-bold">{{ $t('admin.product.manage') }}</h4>
       <div class="d-flex gap-2">
         <button class="btn btn-outline-primary" @click="goToAdd('clothes')">
-          ➕ Thêm sản phẩm quần áo
+          {{ $t('admin.product.add_clothes') }}
         </button>
         <button class="btn btn-outline-success" @click="goToAdd('present')">
-          🎁 Thêm sản phẩm quà lưu niệm
+          {{ $t('admin.product.add_presents') }}
         </button>
       </div>
     </div>
 
     <!-- Quần áo -->
-    <h5 class="text-primary mb-3">Sản phẩm quần áo</h5>
+    <h5 class="text-primary mb-3">{{ $t('admin.product.clothes_list') }}</h5>
     <div class="list-group mb-5">
       <div
         v-for="item in clothes"
@@ -34,22 +34,24 @@
             <div
                 class="d-inline-block rounded-circle border border-2"
                 :style="{ backgroundColor: item.color?.color_code, width: '16px', height: '16px' }"
-                title="Màu"
+                title="{{ $t('admin.product.color') }}"
             ></div>
             📏 {{ item.size?.name }} |
-            📦 {{ item.stock }} cái
+            📦 {{ item.stock }} {{ $t('admin.product.item') }}
             </div>
           </div>
         </div>
         <div class="d-flex gap-2">
-          <button class="btn btn-sm btn-outline-primary" @click="edit('clothes', item.product_clothes.id)">Sửa</button>
-          <button class="btn btn-sm btn-outline-danger" @click="remove(item.id, 'clothes')">Xóa</button>
+          <button class="btn btn-sm btn-outline-primary" @click="edit('clothes', item.product_clothes.id)">{{ $t('admin.product.edit_sp') }}</button>
+          <button class="btn btn-sm btn-outline-danger" @click="removeProduct(item.product_clothes.id, 'clothes')">{{ $t('admin.product.delete_sp') }}</button>
+          <div class="border-start border-2 border-secondary mx-1"></div>
+          <button class="btn btn-sm btn-outline-secondary" @click="remove(item.id, 'clothes')">{{ $t('admin.product.delete_detail') }}</button>
         </div>
       </div>
     </div>
 
     <!-- Quà lưu niệm -->
-    <h5 class="text-success mb-3">  Sản phẩm quà lưu niệm</h5>
+    <h5 class="text-success mb-3">  {{ $t('admin.product.presents_list') }}</h5>
     <div class="list-group">
       <div
         v-for="item in presents"
@@ -66,14 +68,16 @@
             <strong>{{ item.product_present.name }}</strong>
             <div class="small text-muted">
               💰 {{ formatPrice(item.product_present.price) }} |
-              📦 {{ item.stock }} cái |
+              📦 {{ item.stock }} {{ $t('admin.product.item') }} |
               🧱 {{ item.product_present.metarial }}
             </div>
           </div>
         </div>
         <div class="d-flex gap-2">
-          <button class="btn btn-sm btn-outline-primary" @click="edit('present', item.product_present.id)">Sửa</button>
-          <button class="btn btn-sm btn-outline-danger" @click="remove(item.id, 'present')">Xóa</button>
+          <button class="btn btn-sm btn-outline-primary" @click="edit('present', item.product_present.id)">{{ $t('admin.product.edit_sp') }}</button>
+          <button class="btn btn-sm btn-outline-danger" @click="removeProduct(item.product_present.id, 'presents')">{{ $t('admin.product.delete_sp') }}</button>
+          <div class="border-start border-2 border-secondary mx-1"></div>
+          <button class="btn btn-sm btn-outline-secondary" @click="remove(item.id, 'present')">{{ $t('admin.product.delete_detail') }}</button>
         </div>
       </div>
     </div>
@@ -83,8 +87,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+
 import { fetchClothes, fetchPresents } from '../../../services/productService'
+import { useAuthStore } from '../../../store/auth'
 import axios from 'axios'
+const auth = useAuthStore()
+
 
 const router = useRouter()
 const clothes = ref<any[]>([])
@@ -101,13 +109,28 @@ const loadData = async () => {
 }
 
 const remove = async (id: number, type: string) => {
-  if (!confirm('Bạn có chắc chắn muốn xóa không?')) return
+  if (!confirm('Bạn có chắc chắn muốn xóa chi tiết này không?')) return
   try {
-    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/detail-${type}/${id}`)
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/detail-${type}/${id}`, {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
     await loadData()
   } catch (err) {
     console.error('Xóa thất bại:', err)
     alert('Xóa thất bại')
+  }
+}
+
+const removeProduct = async (id: number, endpointType: string) => {
+  if (!confirm(`Bạn có chắc muốn xóa TOÀN BỘ sản phẩm này?`)) return
+  try {
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/${endpointType}/${id}`, {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+    await loadData()
+  } catch (err) {
+    console.error('Xóa sản phẩm cốt lõi thất bại:', err)
+    alert('Xóa sản phẩm thất bại')
   }
 }
 

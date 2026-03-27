@@ -6,6 +6,8 @@ import ExportExcel from './ExportExcel.vue'
 import Pagination from '../../../layouts/paginate/Paginate.vue'
 
 const toast = useToast()
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 
 const filters = ref({
   date_from: '',
@@ -41,7 +43,7 @@ const handleUpdate = async (orderId: number) => {
   if (!status) return
   try {
     await updateStatus(orderId, status)
-    message.value = '✅ Cập nhật trạng thái thành công'
+    message.value = '✅ ' + t('admin.order.update') + ' trạng thái thành công'
     await fetchOrders(currentPage.value)
   } catch (err) {
     console.error(err)
@@ -75,30 +77,30 @@ onMounted(() => fetchOrders())
 
 <template>
   <div class="container py-4">
-    <h2 class="mb-4 text-dark">Quản lý đơn hàng</h2>
+    <h2 class="mb-4 text-dark">{{ $t('admin.order.manage') }}</h2>
 
     <!-- FILTER -->
     <div class="card p-3 mb-1 shadow-sm">
       <div class="row g-3">
         <div class="col-md-3">
-          <label>Ngày bắt đầu</label>
+          <label>{{ $t('admin.order.date_from') }}</label>
           <input type="date" class="form-control" v-model="filters.date_from" />
         </div>
         <div class="col-md-3">
-          <label>Ngày kết thúc</label>
+          <label>{{ $t('admin.order.date_to') }}</label>
           <input type="date" class="form-control" v-model="filters.date_to" />
         </div>
         <div class="col-md-3">
-          <label>Giá tối thiểu</label>
+          <label>{{ $t('admin.order.price_min') }}</label>
           <input type="number" class="form-control" v-model="filters.price_min" />
         </div>
         <div class="col-md-3">
-          <label>Giá tối đa</label>
+          <label>{{ $t('admin.order.price_max') }}</label>
           <input type="number" class="form-control" v-model="filters.price_max" />
         </div>
       </div>
       <div class="text-end mt-3">
-        <button class="btn btn-primary" @click="fetchOrders(1)">🔍 Lọc</button>
+        <button class="btn btn-primary" @click="fetchOrders(1)">{{ $t('admin.order.filter') }}</button>
       </div>
     </div>
 
@@ -109,11 +111,11 @@ onMounted(() => fetchOrders())
     <table class="table table-bordered align-middle">
       <thead class="table-light text-center">
         <tr>
-          <th>ID</th>
-          <th>Ngày</th>
-          <th>Tổng tiền</th>
-          <th>Trạng thái</th>
-          <th>Hành động</th>
+          <th>{{ $t('admin.order.id') }}</th>
+          <th>{{ $t('admin.order.date') }}</th>
+          <th>{{ $t('admin.order.total_price') }}</th>
+          <th>{{ $t('admin.order.status') }}</th>
+          <th>{{ $t('admin.order.actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -137,26 +139,26 @@ onMounted(() => fetchOrders())
             </td>
             <td class="text-center">
               <button class="btn btn-sm btn-outline-info me-2" @click="toggleDetails(order.id)">
-                {{ expandedOrderId === order.id ? 'Ẩn' : 'Chi tiết' }}
+                {{ expandedOrderId === order.id ? t('admin.order.hide') : t('admin.order.detail') }}
               </button>
 
               <template v-if="!['completed', 'cancelled'].includes(order.status)">
                 <select class="form-select form-select-sm d-inline w-auto me-1" v-model="selectedStatus[order.id]">
-                  <option disabled value="">--Chọn--</option>
-                  <option v-if="order.status === 'pending'" value="delivering">Đang giao</option>
-                  <option v-if="order.status === 'pending'" value="cancelled">Huỷ</option>
-                  <option v-if="order.status === 'delivering'" value="delivered">Đã giao</option>
-                  <option v-if="order.status === 'delivering'" value="cancelled">Huỷ</option>
-                  <option v-if="['delivering','delivered'].includes(order.status)" value="completed">Hoàn tất</option>
+                  <option disabled value="">{{ $t('admin.user.select') }}</option>
+                  <option v-if="order.status === 'pending'" value="delivering">{{ $t('admin.order.delivering') }}</option>
+                  <option v-if="order.status === 'pending'" value="cancelled">{{ $t('admin.order.cancelled') }}</option>
+                  <option v-if="order.status === 'delivering'" value="delivered">{{ $t('admin.order.delivered') }}</option>
+                  <option v-if="order.status === 'delivering'" value="cancelled">{{ $t('admin.order.cancelled') }}</option>
+                  <option v-if="['delivering','delivered'].includes(order.status)" value="completed">{{ $t('admin.order.completed') }}</option>
                 </select>
                 <button class="btn btn-sm btn-outline-success" @click="handleUpdate(order.id)" :disabled="!selectedStatus[order.id]">
-                  Cập nhật
+                  {{ $t('admin.order.update') }}
                 </button>
               </template>
 
               <button class="btn btn-sm btn-outline-dark d-inline-flex align-items-center gap-1 ms-3"
                 @click="handleDownloadOrder(order.id)">
-                🖨️ <span>In đơn</span>
+                <span>{{ $t('admin.order.print') }}</span>
               </button>
             </td>
           </tr>

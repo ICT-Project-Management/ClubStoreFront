@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3 class="mb-4">🎉 Chào mừng bạn đến trang quản trị!</h3>
+    <h3 class="mb-4">{{ $t('dashboard.welcome') }}</h3>
 
     <!-- Thống kê -->
     <div class="row g-4 mb-4">
@@ -19,13 +19,13 @@
     <div class="row g-4 mb-4">
       <div class="col-md-6">
         <div class="card shadow-sm p-3">
-          <h5 class="mb-3">📊 Doanh thu theo tháng</h5>
+          <h5 class="mb-3">{{ $t('dashboard.monthly_revenue') }}</h5>
           <BarChart :chart-data="revenueData" />
         </div>
       </div>
       <div class="col-md-6">
         <div class="card shadow-sm p-3">
-          <h5 class="mb-3">📈 Đơn hàng mỗi tháng</h5>
+          <h5 class="mb-3">{{ $t('dashboard.monthly_orders') }}</h5>
           <LineChart :chart-data="orderData" />
         </div>
       </div>
@@ -33,25 +33,25 @@
 
     <!-- Đơn hàng gần đây -->
     <div class="card shadow-sm p-3">
-      <h5 class="mb-3">🧾 Đơn hàng gần đây</h5>
+      <h5 class="mb-3">{{ $t('dashboard.recent_orders') }}</h5>
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Khách hàng</th>
-            <th>Ngày</th>
-            <th>Tổng</th>
-            <th>Trạng thái</th>
+            <th>{{ $t('dashboard.id') }}</th>
+            <th>{{ $t('dashboard.customer') }}</th>
+            <th>{{ $t('dashboard.date') }}</th>
+            <th>{{ $t('dashboard.total') }}</th>
+            <th>{{ $t('dashboard.status') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="order in recentOrders" :key="order.id">
             <td>#{{ order.id }}</td>
-            <td>{{ order.customer }}</td>
-            <td>{{ order.date }}</td>
-            <td>{{ order.total }}</td>
+            <td>{{ order.user?.name || 'Khách hàng' }}</td>
+            <td>{{ new Date(order.created_at || order.date).toLocaleDateString() }}</td>
+            <td>{{ formatPrice(order.total_price || 0) }}</td>
             <td>
-              <span :class="['badge', getStatusClass(order.status)]">{{ order.status }}</span>
+              <span :class="['badge', getStatusClass(order.status)]">{{ getStatusName(order.status) }}</span>
             </td>
           </tr>
         </tbody>
@@ -61,51 +61,88 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
+import axios from 'axios'
+import { useAuthStore } from '../../store/auth'
+import { useI18n } from 'vue-i18n'
 import BarChart from '../../charts/BarChart.vue'
 import LineChart from '../../charts/LineChart.vue'
 
-const stats = [
-  { label: 'Người dùng', value: 128, icon: 'bi bi-people' },
-  { label: 'Đơn hàng', value: 56, icon: 'bi bi-bag-check' },
-  { label: 'Sản phẩm', value: 42, icon: 'bi bi-box' },
-  { label: 'Doanh thu', value: '52.000.000₫', icon: 'bi bi-currency-dollar' },
-]
+const auth = useAuthStore()
+const { t } = useI18n()
+const API = import.meta.env.VITE_API_BASE_URL
 
-// Dữ liệu biểu đồ (giả lập)
-const revenueData = {
-  labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
+const formatPrice = (val: number) => new Intl.NumberFormat('vi-VN').format(val) + '₫'
+
+const totalUsers = ref(0)
+const totalOrders = ref(0)
+const totalProducts = ref(0)
+const totalRevenue = ref(0)
+const recentOrders = ref<any[]>([])
+
+const stats = computed(() => [
+  { label: t('dashboard.users'), value: totalUsers.value, icon: 'bi bi-people' },
+  { label: t('dashboard.orders'), value: totalOrders.value, icon: 'bi bi-bag-check' },
+  { label: t('dashboard.products'), value: totalProducts.value, icon: 'bi bi-box' },
+  { label: t('dashboard.revenue'), value: formatPrice(totalRevenue.value), icon: 'bi bi-currency-dollar' },
+])
+
+const chartData = ref({ labels: [], revenue: [], orders: [] })
+
+const loadData = async () => {
+  try {
+    const headers = { Authorization: `Bearer ${auth.token}` }
+    const res = await axios.get(`${API}/dashboard/stats`, { headers })
+    
+    const data = res.data
+
+    totalUsers.value = data.total_users || 0
+    totalOrders.value = data.total_orders || 0
+    totalProducts.value = data.total_products || 0
+    totalRevenue.value = data.total_revenue || 0
+    recentOrders.value = data.recent_orders || []
+
+    chartData.value = data.chart || { labels: [], revenue: [], orders: [] }
+  } catch(e) { console.error('Load Error') }
+}
+
+onMounted(loadData)
+
+const revenueData = computed(() => ({
+  labels: chartData.value.labels,
   datasets: [
     {
       label: 'Doanh thu (VNĐ)',
       backgroundColor: '#0d6efd',
-      data: [10, 15, 8, 18, 20, 25],
+      data: chartData.value.revenue,
     },
   ],
-}
+}))
 
-const orderData = {
-  labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
+const orderData = computed(() => ({
+  labels: chartData.value.labels,
   datasets: [
     {
       label: 'Số đơn hàng',
       borderColor: '#198754',
-      data: [5, 12, 8, 14, 10, 18],
+      data: chartData.value.orders,
       fill: false,
       tension: 0.4,
     },
   ],
+}))
+
+const getStatusName = (status: string) => {
+  if (status === 'Đã giao' || status === 'completed') return t('dashboard.delivered')
+  if (status === 'Đang xử lý' || status === 'pending') return t('dashboard.processing')
+  if (status === 'Đã hủy' || status === 'cancelled') return t('dashboard.cancelled')
+  return status
 }
 
-const recentOrders = [
-  { id: 1001, customer: 'Nguyễn Văn A', date: '2025-06-30', total: '1.200.000₫', status: 'Đã giao' },
-  { id: 1002, customer: 'Trần Thị B', date: '2025-06-29', total: '850.000₫', status: 'Đang xử lý' },
-  { id: 1003, customer: 'Lê C', date: '2025-06-28', total: '2.100.000₫', status: 'Đã hủy' },
-]
-
 const getStatusClass = (status: string) => {
-  if (status === 'Đã giao') return 'bg-success'
-  if (status === 'Đang xử lý') return 'bg-warning text-dark'
-  if (status === 'Đã hủy') return 'bg-danger'
+  if (status === 'Đã giao' || status === 'completed') return 'bg-success'
+  if (status === 'Đang xử lý' || status === 'pending') return 'bg-warning text-dark'
+  if (status === 'Đã hủy' || status === 'cancelled') return 'bg-danger'
   return 'bg-secondary'
 }
 </script>

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { newsService } from '../../../services/newsService'
 
 const router = useRouter()
+const { t } = useI18n()
 const toast = useToast()
 
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -38,7 +40,7 @@ const handleFileChange = (e: Event) => {
 
 const handleSubmit = async () => {
   if (!form.value.title || !form.value.description || !form.value.content || !form.value.image) {
-    toast.error('❗ Vui lòng nhập đầy đủ thông tin và chọn ảnh!')
+    toast.error('' + t('admin.news.error_empty') + '')
     return
   }
 
@@ -50,7 +52,7 @@ const handleSubmit = async () => {
 
   try {
     await newsService.addNews(formData)
-    toast.success('✅ Thêm tin tức thành công!')
+    toast.success('' + t('admin.news.add_success') + '')
     router.push('/admin/news')
   } catch (err) {
     console.error(err)
@@ -61,25 +63,25 @@ const handleSubmit = async () => {
 
 <template>
   <div class="container mt-4">
-    <h2 class="fw-bold mb-4">📝 Thêm Tin Tức Mới</h2>
+    <h2 class="fw-bold mb-4">{{ $t('admin.news.create_title') }}</h2>
 
     <div class="card shadow-sm">
       <div class="card-body">
         <!-- Tiêu đề -->
         <div class="mb-3">
-          <label class="form-label fw-semibold">Tiêu đề</label>
-          <input v-model="form.title" type="text" class="form-control" placeholder="Nhập tiêu đề..." />
+          <label class="form-label fw-semibold">{{ $t('admin.news.form_title') }}</label>
+          <input v-model="form.title" type="text" class="form-control" :placeholder="$t('admin.news.form_title')" />
         </div>
 
         <!-- Mô tả -->
         <div class="mb-3">
-          <label class="form-label fw-semibold">Mô tả</label>
-          <input v-model="form.description" type="text" class="form-control" placeholder="Nhập mô tả..." />
+          <label class="form-label fw-semibold">{{ $t('admin.news.form_desc') }}</label>
+          <input v-model="form.description" type="text" class="form-control" :placeholder="$t('admin.news.form_desc')" />
         </div>
 
         <!-- Nội dung -->
         <div class="mb-3">
-          <label class="form-label fw-semibold">Nội dung</label>
+          <label class="form-label fw-semibold">{{ $t('admin.news.form_content') }}</label>
           <QuillEditor
             v-model:content="form.content"
             contentType="html"
@@ -91,7 +93,7 @@ const handleSubmit = async () => {
 
         <!-- Ảnh đại diện -->
         <div class="mb-4">
-          <label class="form-label fw-semibold">Ảnh đại diện</label>
+          <label class="form-label fw-semibold">{{ $t('admin.news.form_image') }}</label>
           <div
             class="border rounded p-4 text-center"
             @dragover.prevent
@@ -101,9 +103,9 @@ const handleSubmit = async () => {
           >
             <div v-if="form.imagePreview">
               <img :src="form.imagePreview" class="img-thumbnail" style="max-height: 150px" />
-              <p class="mt-2 text-muted">Ảnh đã chọn</p>
+              <p class="mt-2 text-muted">{{ $t('admin.news.selected_img') }}</p>
             </div>
-            <div v-else class="text-muted">Kéo thả ảnh vào đây hoặc click để chọn</div>
+            <div v-else class="text-muted">{{ $t('admin.news.drag_drop') }}</div>
             <input
               ref="fileInput"
               type="file"
@@ -116,8 +118,8 @@ const handleSubmit = async () => {
 
         <!-- Hành động -->
         <div class="d-flex gap-2">
-          <button class="btn btn-success" @click="handleSubmit">Lưu tin</button>
-          <button class="btn btn-secondary" @click="$router.back()">Quay lại</button>
+          <button class="btn btn-success" @click="handleSubmit">{{ $t('admin.news.save') }}</button>
+          <button class="btn btn-secondary" @click="$router.back()">{{ $t('admin.news.back') }}</button>
         </div>
       </div>
     </div>

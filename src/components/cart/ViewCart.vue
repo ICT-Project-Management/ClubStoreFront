@@ -29,7 +29,13 @@
                 <td>{{ item.detail_clothes.color.name }}</td>
                 <td>{{ item.detail_clothes.size.name }}</td>
                 <td>{{ formatPrice(item.detail_clothes.product_clothes.price) }}₫</td>
-                <td>{{ item.quantity }}</td>
+                <td>
+                  <div class="d-flex justify-content-center align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" style="width: 28px;" @click="updateQty(item.id, item.quantity - 1, 'clothes')">-</button>
+                    <span>{{ item.quantity }}</span>
+                    <button class="btn btn-sm btn-outline-secondary" style="width: 28px;" @click="updateQty(item.id, item.quantity + 1, 'clothes')">+</button>
+                  </div>
+                </td>
                 <td>{{ formatPrice(item.detail_clothes.product_clothes.price * item.quantity) }}₫</td>
                 <td>
                   <button class="btn btn-sm btn-danger" @click="deleteClothesItem(item.id)">🗑️</button>
@@ -60,7 +66,13 @@
                 <td>{{ item.detail_present.product_present.name }}</td>
                 <td>{{ item.detail_present.product_present.metarial }}</td>
                 <td>{{ formatPrice(item.detail_present.product_present.price) }}₫</td>
-                <td>{{ item.quantity }}</td>
+                <td>
+                  <div class="d-flex justify-content-center align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" style="width: 28px;" @click="updateQty(item.id, item.quantity - 1, 'presents')">-</button>
+                    <span>{{ item.quantity }}</span>
+                    <button class="btn btn-sm btn-outline-secondary" style="width: 28px;" @click="updateQty(item.id, item.quantity + 1, 'presents')">+</button>
+                  </div>
+                </td>
                 <td>{{ formatPrice(item.detail_present.product_present.price * item.quantity) }}₫</td>
                 <td>
                   <button class="btn btn-sm btn-danger" @click="deletePresentItem(item.id)">🗑️</button>
@@ -152,6 +164,28 @@ const deletePresentItem = async (id: number) => {
     })
     toast.success('Quà lưu niệm đã được xoá khỏi giỏ hàng!')
     await cartStore.fetchCart(auth.user?.id)
+  }
+}
+
+const updateQty = async (id: number, quantity: number, type: string) => {
+  if (quantity < 1) {
+    if (type === 'clothes') deleteClothesItem(id)
+    else deletePresentItem(id)
+    return
+  }
+  try {
+    const res = await fetch(`${API}/cart/${type}/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${auth.token}`
+      },
+      body: JSON.stringify({ quantity })
+    })
+    if (!res.ok) throw new Error('Update failed')
+    await cartStore.fetchCart(auth.user?.id)
+  } catch (err) {
+    toast.error('Cập nhật số lượng thất bại!')
   }
 }
 

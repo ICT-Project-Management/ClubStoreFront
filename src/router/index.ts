@@ -10,6 +10,8 @@ import AddClothes from '../components/admin/product/AddClothes.vue'
 import AddPresent from '../components/admin/product/AddPresent.vue'
 import AddDetailClothes from '../components/admin/product/AddDetailClothes.vue'
 import AddDetailPresent from '../components/admin/product/AddDetailPresent.vue'
+import ColorIndex from '../components/admin/product/ColorIndex.vue'
+import SizeIndex from '../components/admin/product/SizeIndex.vue'
 
 import ListUser from '../components/admin/user/ListUser.vue'
 import ViewCart from '../components/cart/ViewCart.vue'
@@ -26,6 +28,7 @@ import NewsAdmin from '../components/admin/news/NewsAdmin.vue'
 import CreateNews from '../components/admin/news/CreateNews.vue'
 import AllNews from '../components/user/news/AllNews.vue'
 import VNpayReturn from '../components/user/orders/VNpayReturn.vue'
+import Favorites from '../components/user/Favorites.vue'
 
 const routes = [
   { path: '/', component: Home },
@@ -48,6 +51,8 @@ const routes = [
       { path: 'products/add-present', component: AddPresent },
       { path: 'products/add-detail-clothes', component: AddDetailClothes },
       { path: 'products/add-detail-present', component: AddDetailPresent },
+      { path: 'colors', component: ColorIndex },
+      { path: 'sizes', component: SizeIndex },
       { path: 'orders', component: OrderAdminIndex }, 
       { path: 'news', component: NewsAdmin,},
       { path: 'news/create', component: CreateNews },
@@ -82,9 +87,14 @@ const routes = [
     component: AllNews,
   },
   {
-  path: '/payment/vnpay/return',
-  component: VNpayReturn
-}
+    path: '/payment/vnpay/return',
+    component: VNpayReturn
+  },
+  {
+    path: '/wishlist',
+    component: Favorites,
+    meta: { requiresAuth: true }
+  }
 ]
 
 const router = createRouter({
@@ -92,7 +102,7 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const auth = useAuthStore()
 
   const roles = auth.user?.roles || []

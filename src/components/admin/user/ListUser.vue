@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-5">
-    <h3 class="mb-4">📋 Danh sách người dùng</h3>
+    <h3 class="mb-4">{{ $t('admin.user.list') }}</h3>
 
     <!-- Tìm kiếm -->
     <div class="mb-3 d-flex align-items-center gap-2 flex-wrap">
@@ -8,7 +8,7 @@
         v-model="searchName"
         type="text"
         class="form-control"
-        placeholder="Tìm theo tên"
+        :placeholder="t('admin.user.search_name')"
         style="max-width: 250px"
         @keyup.enter="fetchUsers"
       />
@@ -16,23 +16,23 @@
         v-model="searchEmail"
         type="text"
         class="form-control"
-        placeholder="Tìm theo email"
+        :placeholder="t('admin.user.search_email')"
         style="max-width: 250px"
         @keyup.enter="fetchUsers"
       />
-      <button class="btn btn-outline-info" @click="fetchUsers">🔍 Tìm kiếm</button>
-      <button class="btn btn-outline-secondary" @click="clearSearch">🔄 Làm mới</button>
+      <button class="btn btn-outline-info" @click="fetchUsers">{{ $t('admin.user.search_btn') }}</button>
+      <button class="btn btn-outline-secondary" @click="clearSearch">{{ $t('admin.user.refresh') }}</button>
     </div>
 
     <!-- Bảng danh sách -->
     <table class="table table-hover">
       <thead class="table-light">
         <tr>
-          <th>STT</th>
-          <th>Họ tên</th>
-          <th>Email</th>
-          <th>Quyền</th>
-          <th>Thao tác</th>
+          <th>{{ $t('admin.user.stt') }}</th>
+          <th>{{ $t('admin.user.fullname') }}</th>
+          <th>{{ $t('admin.user.email') }}</th>
+          <th>{{ $t('admin.user.role') }}</th>
+          <th>{{ $t('admin.user.actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -65,10 +65,10 @@
                 style="background-color: skyblue; color: white"
                 @click="confirmUpdateRole(user)"
               >
-                ✔️ Cập nhật
+                {{ $t('admin.user.update') }}
               </button>
               <button class="btn btn-sm btn-outline-danger" @click="cancelEdit">
-                ❌ Huỷ
+                {{ $t('admin.user.cancel') }}
               </button>
             </template>
           </td>
@@ -80,11 +80,9 @@
                 style="background-color: skyblue; color: white"
                 @click="startEdit(user)"
               >
-                Cập nhật quyền
+                {{ $t('admin.user.update_role') }}
               </button>
-              <button class="btn btn-sm btn-outline-danger" @click="deleteUser(user.id)">
-                Xoá
-              </button>
+              <button class="btn btn-sm btn-outline-danger" @click="deleteUser(user.id)">{{ $t('admin.user.delete') }}</button>
             </template>
           </td>
         </tr>
@@ -99,6 +97,8 @@ import axios from 'axios'
 import { useAuthStore } from '../../../store/auth'
 import { useToast } from 'vue-toastification'
 const toast = useToast()
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const auth = useAuthStore()
 const users = ref<any[]>([])
 const editingUserId = ref<number | null>(null)
@@ -155,12 +155,12 @@ const confirmUpdateRole = async (user: any) => {
         }
       }
     )
-    toast.success('Cập nhật quyền thành công!')
+    toast.success(t('admin.user.update_role') + ' thành công!')
     editingUserId.value = null
     fetchUsers()
   } catch (err) {
     console.error('❌ Cập nhật lỗi:', err)
-    toast.error('Cập nhật quyền thất bại!')
+    toast.error(t('admin.user.update_role') + ' thất bại!')
   }
 }
 
